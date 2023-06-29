@@ -4,10 +4,11 @@ import random
 
 class Action():
     def __init__(self, obs):
-        self.size1, self.size2 = 1200, 500
+        self.size1, self.size2 = 1500, 500
         self.player, self.ball_pos, self.ball_v = obs
         self.L1, self.L2, self.L3 = self.player.L1, self.player.L2, self.player.L3
         self.maxtry = 5
+        self.max_v = 0.1
 
     def get_hit_position(self):
         ball_x, ball_y = self.ball_pos
@@ -57,8 +58,8 @@ class Action():
         return (theta1 - self.player.theta_1) / 10, (theta2 - self.player.theta_2) / 10, (theta3 - self.player.theta_3) / 10
     
     def regularize(self, theta):
-        while abs(theta) > 0.1:
-            return theta / abs(theta) * 0.1
+        while abs(theta) > self.max_v:
+            return theta / abs(theta) * self.max_v
         return theta
 
     def get_action(self):
@@ -73,6 +74,13 @@ class Action():
         angle1, angle2, angle3 = self.get_velocity(angle1, angle2, angle3)
         return self.regularize(angle1), self.regularize(angle2), self.regularize(angle3)
     
+    def maximize(self, theta1, theta2, theta3):
+        max_theta = max(abs(theta1), abs(theta2), abs(theta3))
+        if abs(max_theta) < 1e-5:
+            return 0, 0, 0
+        factor = self.max_v / max_theta
+        return theta1 * factor, theta2 * factor, theta3 * factor
+    
     def get_sota_action(self):
         if self.ball_v[0] >= 0:
             return 0, 0, 0
@@ -82,9 +90,10 @@ class Action():
             target_x, target_y = self.size1, self.size2
         ball_x, ball_y, angle, t = self.get_hit_position()
         expected_angle = np.arctan((target_y - ball_y) / (target_x - ball_x))
-        delta = 1
-        if t < 10:
+        delta = 10
+        if t < 15:
             angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0] + delta * np.cos(expected_angle), ball_y - self.player.basepos[1] + delta * np.sin(expected_angle), expected_angle)
+            angle1, angle2, angle3 = self.maximize(angle1, angle2, angle3)
         else:
             angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0], ball_y - self.player.basepos[1], expected_angle)
         angle1, angle2, angle3 = self.get_velocity(angle1, angle2, angle3)
