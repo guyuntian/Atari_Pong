@@ -2,8 +2,9 @@ from elements import Ball, Board, Robot, R3bot
 from utils import check_collision, collision
 import numpy as np
 import random
+import gym
 
-class World():
+class World(gym.Env):
     def __init__(self, size = (800, 600), board_length = 80, L_1 = 100, L_2 = 100, L_3 = 60, ball_r = 10, update_rate = 10):
         self.size = size
         self.update_rate = update_rate # 计数器，每十帧接收一次输入
@@ -28,8 +29,9 @@ class World():
     
     def render(self):
         print(self.ball.pos)
+        return
 
-    @classmethod
+
     def step(self, actions): # actions: list of tuple (om1, om2, om3)
         # do the next 10 frames
         left_action = actions[0]
@@ -43,10 +45,10 @@ class World():
             self.Right_Player.update_timestep()
             self.ball.pos[0] += self.ball.v[0] # update ball pos
             self.ball.pos[1] += self.ball.v[1]
-            if self.ball.pos[0] <= self.ball.r:  # out of ground
+            if self.ball.pos[0] <= -self.ball.r:  # out of ground
                 self.finish(True)
                 return self.get_obs(False), self.get_obs(True), True
-            elif self.ball.pos[0] >= self.size[1] - self.ball.r:
+            elif self.ball.pos[0] >= self.size[1] + self.ball.r:
                 self.finish(False)
                 return self.get_obs(False), self.get_obs(True), True
             if self.ball.pos[1] < self.ball.r: # bounce back
@@ -76,7 +78,7 @@ class World():
         self.Left_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
         self.Right_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
         self.ball = Ball([self.size[0]/2, self.size[1]/2], [0, 0], self.ball_r)
-        if random.random() > 0.5:
+        if random.random() > 1:
             self.ball.v = [5, 0]
         else:
             self.ball.v = [-5, 0]

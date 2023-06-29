@@ -13,7 +13,7 @@ def check_collision(ball: Ball, board: Board): # check if the ball and the board
         else:
             return board.pos
     else:
-        alpha = math.atan2((ball.pos[1]-board.pos[1])/(ball.pos[0]-board.pos[0]))
+        alpha = math.atan((ball.pos[1]-board.pos[1])/(ball.pos[0]-board.pos[0]))
         l = abs(s*math.cos(alpha-board.angle-math.pi/2))
         d = abs(s*math.sin(alpha-board.angle-math.pi/2))
         if l < board.L/2 and d < ball.r:

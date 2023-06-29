@@ -26,9 +26,17 @@ class Action():
         A = 2 * tmp2 * self.L1
         B = 2 * tmp1 * self.L1
         C = tmp3 / np.sqrt(A**2 + B**2)
-        phi = np.arctan(B/A)
+        if A == 0:
+            phi = np.pi / 2
+            if B < 0:
+                phi = -phi
+        else:
+            phi = np.arctan(B/A)
+        
         theta1 = np.arcsin(C) - phi
         theta2 = np.arccos((tmp1 - self.L1 * np.cos(theta1))/self.L2) - theta1
+        if abs(y - self.L3 * np.sin(angle) - self.L2 * np.sin(theta1 + theta2) - self.L1 * np.sin(theta1)) > 1e-3:
+            theta2 = -np.arccos((tmp1 - self.L1 * np.cos(theta1))/self.L2) - theta1
         theta3 = angle - theta1 - theta2
         return theta1, theta2, theta3
     
@@ -42,8 +50,9 @@ class Action():
         ball_x, ball_y, angle = self.get_hit_position()
         if abs(ball_y - self.player.basepos[1]) > self.L1 + self.L2 + self.L3:
             return 0, 0, 0
-
+        
         angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0], ball_y - self.player.basepos[1], angle)
+
         return self.get_velocity(angle1, angle2, angle3)
 
     
