@@ -5,7 +5,7 @@ import random
 import gym
 
 class World(gym.Env):
-    def __init__(self, size = (800, 600), board_length = 80, L_1 = 100, L_2 = 100, L_3 = 60, ball_r = 10, update_rate = 10):
+    def __init__(self, size = (1200, 500), board_length = 80, L_1 = 100, L_2 = 100, L_3 = 60, ball_r = 10, update_rate = 10):
         self.size = size
         self.update_rate = update_rate # 计数器，每十帧接收一次输入
         self.board_length = board_length
@@ -28,7 +28,7 @@ class World(gym.Env):
         return self.Left_Player, self.ball.pos, self.ball.v
     
     def render(self):
-        print(self.ball.pos)
+        #print(self.ball.pos)
         return
 
 
@@ -48,7 +48,7 @@ class World(gym.Env):
             if self.ball.pos[0] <= -self.ball.r:  # out of ground
                 self.finish(True)
                 return self.get_obs(False), self.get_obs(True), True
-            elif self.ball.pos[0] >= self.size[1] + self.ball.r:
+            elif self.ball.pos[0] >= self.size[0] + self.ball.r:
                 self.finish(False)
                 return self.get_obs(False), self.get_obs(True), True
             if self.ball.pos[1] < self.ball.r: # bounce back
@@ -73,15 +73,14 @@ class World(gym.Env):
         return
 
     def reset(self): # game start right after calling reset() 
-        self.left_score = 0
-        self.right_score = 0
         self.Left_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
         self.Right_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
         self.ball = Ball([self.size[0]/2, self.size[1]/2], [0, 0], self.ball_r)
-        if random.random() > 1:
+        if random.random() > 0.5:
             self.ball.v = [5, 0]
         else:
             self.ball.v = [-5, 0]
+        self.ball.v[1] = np.random.randint(-2, 2)
         
         return self.get_obs(False), self.get_obs(True)
 

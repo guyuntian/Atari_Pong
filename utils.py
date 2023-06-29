@@ -40,7 +40,7 @@ def collision(ball: Ball, board: Board, cpos):
         v_board_x = board.omega*l*math.cos(c_angle) + board.v[0]
         v_board_y = board.omega*l*math.sin(c_angle) + board.v[1]
         v_board = [v_board_x, v_board_y]
-    v_ball = [2*v_board[0] - ball.v[0], 2*v_board - ball.v[1]]
+    v_ball = [2*v_board[0] - ball.v[0], 2*v_board[1] - ball.v[1]]
     return v_ball
 
 
