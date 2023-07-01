@@ -4,21 +4,23 @@ import numpy as np
 import random
 import gym
 import matplotlib.pyplot as plt
+from config import config
 
 class World(gym.Env):
-    def __init__(self, size = (1500, 500), board_length = 80, L_1 = 100, L_2 = 100, L_3 = 60, ball_r = 10, update_rate = 10):
-        self.size = size
-        self.update_rate = update_rate # 计数器，每十帧接收一次输入
-        self.board_length = board_length
-        self.L1 = L_1
-        self.L2 = L_2
-        self.L3 = L_3
-        self.ball_r = ball_r
+    def __init__(self):
+        self.co = config()
+        self.size = self.co.env_size
+        self.update_rate = self.co.update_rate # 计数器，每十帧接收一次输入
+        self.board_length = self.co.board_length
+        self.L1 = self.co.L_1
+        self.L2 = self.co.L_2
+        self.L3 = self.co.L_3
+        self.ball_r = self.co.ball_r
         self.left_score = 0
         self.right_score = 0
-        self.Left_Player = R3bot((0, self.size[1]/2), Board(board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
-        self.Right_Player = R3bot((0, self.size[1]/2), Board(board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
-        self.ball = Ball([size[0]/2, size[1]/2], [0, 0], self.ball_r)
+        self.Left_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
+        self.Right_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
+        self.ball = Ball([self.size[0]/2, self.size[1]/2], [0, 0], self.ball_r)
         # We'll do a 180 degree turn for all coordinates for Right_Player
         self.draw = 0
 
@@ -73,11 +75,11 @@ class World(gym.Env):
         self.Right_Player = R3bot((0, self.size[1]/2), Board(self.board_length, (self.L1+self.L2+self.L3), 0, [0, 0], 0), self.L1, 0, self.L2, 0, self.L3, 0, 0, 0, 0)
         self.ball = Ball([self.size[0]/2, self.size[1]/2], [0, 0], self.ball_r)
         if random.random() > 0.5:
-            self.ball.v = [5, 0]
+            self.ball.v = [self.co.initial_ball_vx, 0]
         else:
-            self.ball.v = [-5, 0]
-        self.ball.v[1] = np.random.randint(-5, 5)
-        
+            self.ball.v = [-self.co.initial_ball_vx, 0]
+        self.ball.v[1] = np.random.randint(-self.co.initial_ball_vy, self.co.initial_ball_vy+1)
+        self.ball.v = [-5, -2]
         return self.get_obs(False), self.get_obs(True)
 
     def render(self):
@@ -89,7 +91,7 @@ class World(gym.Env):
                                  + self.Left_Player.L2 * np.sin(self.Left_Player.theta_1 + self.Left_Player.theta_2),\
                         self.Bd.pos[1]])
         left_bd_x = [self.Bd.pos[0] + np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2]
-        left_bd_y = [self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2]
+        left_bd_y = [self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[1] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2]
         self.Bd = self.Right_Player.Bd
         right_x = np.array([self.Left_Player.basepos[0], self.Left_Player.basepos[0] + self.Right_Player.L1 * np.cos(self.Right_Player.theta_1), self.Left_Player.basepos[0] + self.Right_Player.L1 * np.cos(self.Right_Player.theta_1)\
                                  + self.Right_Player.L2 * np.cos(self.Right_Player.theta_1 + self.Right_Player.theta_2),\
@@ -99,7 +101,7 @@ class World(gym.Env):
                                  + self.Right_Player.L2 * np.sin(self.Right_Player.theta_1 + self.Right_Player.theta_2),\
                         self.Bd.pos[1]])
         right_bd_x = np.array([self.Bd.pos[0] + np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
-        right_bd_y = np.array([self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
+        right_bd_y = np.array([self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[1] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
         plt.xlim(-200, 200 + self.size[0])
         plt.ylim(-50, 50 + self.size[1])
         plt.plot(left_x, left_y, alpha=0.5, linewidth=1)

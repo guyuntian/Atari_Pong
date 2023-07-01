@@ -8,23 +8,25 @@ from elements import Ball, Board, Robot, R3bot
 from action import Action
 from tqdm import tqdm
 import imageio
+from config import config
 
+co = config()
 env = World()
 left_obs, right_obs = env.reset()
 terminated = False
-random.seed(2023)
-for i in tqdm(range(10000)):
+for i in tqdm(range(co.total_step)):
     # print("Running...Step %d" % i) 
 
     actions = []
     # Action here
     act1 = Action(left_obs)
     act2 = Action(right_obs)
-    actions.append(act1.get_sota_action())
+    actions.append(act1.get_action())
     actions.append(act2.get_action())
     # print(actions)
     left_obs, right_obs, terminated = env.step(actions)
-    total = env.render()
+    if (i+1) % co.step_per_render == 0:
+        total = env.render()
     if terminated:
         left_obs, right_obs = env.reset()
         break
