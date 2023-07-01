@@ -4,11 +4,11 @@ import random
 
 class Action():
     def __init__(self, obs):
-        self.size1, self.size2 = 1500, 500
+        self.size1, self.size2 = 1500, 400
         self.player, self.ball_pos, self.ball_v = obs
         self.L1, self.L2, self.L3 = self.player.L1, self.player.L2, self.player.L3
         self.maxtry = 5
-        self.max_v = 0.1
+        self.max_v = 0.05
 
     def get_hit_position(self):
         ball_x, ball_y = self.ball_pos
@@ -55,7 +55,7 @@ class Action():
         return theta1, theta2, theta3
     
     def get_velocity(self, theta1, theta2, theta3):
-        return (theta1 - self.player.theta_1) / 10, (theta2 - self.player.theta_2) / 10, (theta3 - self.player.theta_3) / 10
+        return (theta1 - self.player.theta_1) / 5, (theta2 - self.player.theta_2) / 5, (theta3 - self.player.theta_3) / 5
     
     def regularize(self, theta):
         while abs(theta) > self.max_v:
@@ -69,8 +69,10 @@ class Action():
         ball_x, ball_y, angle, _ = self.get_hit_position()
         if abs(ball_y - self.player.basepos[1]) > self.L1 + self.L2 + self.L3:
             return 0, 0, 0
-        
-        angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0], ball_y - self.player.basepos[1], angle)
+        if random.random() < 0.8:
+            angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0], ball_y - self.player.basepos[1], angle)
+        else:
+            angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0], ball_y - self.player.basepos[1], random.random() - 0.5)
         angle1, angle2, angle3 = self.get_velocity(angle1, angle2, angle3)
         return self.regularize(angle1), self.regularize(angle2), self.regularize(angle3)
     
@@ -90,7 +92,7 @@ class Action():
             target_x, target_y = self.size1, self.size2
         ball_x, ball_y, angle, t = self.get_hit_position()
         expected_angle = np.arctan((target_y - ball_y) / (target_x - ball_x))
-        delta = 10
+        delta = 1
         if t < 15:
             angle1, angle2, angle3 = self.get_angle(ball_x - self.player.basepos[0] + delta * np.cos(expected_angle), ball_y - self.player.basepos[1] + delta * np.sin(expected_angle), expected_angle)
             angle1, angle2, angle3 = self.maximize(angle1, angle2, angle3)

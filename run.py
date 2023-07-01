@@ -13,21 +13,23 @@ env = World()
 left_obs, right_obs = env.reset()
 terminated = False
 random.seed(2023)
-for i in tqdm(range(10000)):
+total = 0
+for i in tqdm(range(100000)):
     # print("Running...Step %d" % i) 
 
     actions = []
     # Action here
     act1 = Action(left_obs)
     act2 = Action(right_obs)
-    actions.append(act1.get_sota_action())
+    actions.append(act1.get_action())
     actions.append(act2.get_action())
     # print(actions)
     left_obs, right_obs, terminated = env.step(actions)
-    total = env.render()
+    # if (i + 1) % 20 == 0:
+    #     total = env.render()
     if terminated:
         left_obs, right_obs = env.reset()
-        break
+        # break
     # if terminated: 
     #     print(env.Left_Player.Bd.pos, env.Left_Player.Bd.angle)
     #     print(env.Right_Player.Bd.pos, env.Right_Player.Bd.angle)
