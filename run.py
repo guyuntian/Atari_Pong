@@ -24,7 +24,7 @@ for i in tqdm(range(10000)):
     actions.append(act2.get_action())
     # print(actions)
     left_obs, right_obs, terminated = env.step(actions)
-    total = env.render()
+    total = env.draw
     if terminated:
         left_obs, right_obs = env.reset()
         break

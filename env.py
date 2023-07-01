@@ -61,6 +61,8 @@ class World(gym.Env):
             elif check_collision(Right_ball, self.Right_Player.Bd):
                 v_ball = collision(Right_ball, self.Right_Player.Bd, check_collision(Right_ball, self.Right_Player.Bd))
                 self.ball.v = [-v_ball[0], -v_ball[1]]
+            if i%2 == 0:
+                self.render()
         return self.get_obs(False), self.get_obs(True), False # Terminated
 
     def finish(self, right_win = False):
@@ -88,8 +90,8 @@ class World(gym.Env):
         left_y = np.array([self.Left_Player.basepos[1], self.Left_Player.basepos[1] + self.Left_Player.L1 * np.sin(self.Left_Player.theta_1), self.Left_Player.basepos[1] + self.Left_Player.L1 * np.sin(self.Left_Player.theta_1)\
                                  + self.Left_Player.L2 * np.sin(self.Left_Player.theta_1 + self.Left_Player.theta_2),\
                         self.Bd.pos[1]])
-        left_bd_x = [self.Bd.pos[0] + np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2]
-        left_bd_y = [self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2]
+        left_bd_x = np.array([self.Bd.pos[0] + np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
+        left_bd_y = np.array([self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[1] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
         self.Bd = self.Right_Player.Bd
         right_x = np.array([self.Left_Player.basepos[0], self.Left_Player.basepos[0] + self.Right_Player.L1 * np.cos(self.Right_Player.theta_1), self.Left_Player.basepos[0] + self.Right_Player.L1 * np.cos(self.Right_Player.theta_1)\
                                  + self.Right_Player.L2 * np.cos(self.Right_Player.theta_1 + self.Right_Player.theta_2),\
@@ -99,7 +101,7 @@ class World(gym.Env):
                                  + self.Right_Player.L2 * np.sin(self.Right_Player.theta_1 + self.Right_Player.theta_2),\
                         self.Bd.pos[1]])
         right_bd_x = np.array([self.Bd.pos[0] + np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.cos(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
-        right_bd_y = np.array([self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[0] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
+        right_bd_y = np.array([self.Bd.pos[1] + np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2, self.Bd.pos[1] - np.sin(self.Bd.angle + np.pi / 2) * self.Bd.L / 2])
         plt.xlim(-200, 200 + self.size[0])
         plt.ylim(-50, 50 + self.size[1])
         plt.plot(left_x, left_y, alpha=0.5, linewidth=1)
@@ -110,4 +112,4 @@ class World(gym.Env):
         plt.savefig(f"output/{self.draw}.png")
         plt.cla()
         self.draw += 1
-        return self.draw
+        return
